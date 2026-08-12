@@ -174,7 +174,7 @@ public class GameExtractorService {
 		
 		String description = cleanText(game.get("detailed_description").asString());
 		
-		String content = "===NASLOV===\n\n" + name + "\n\n" + "===OPIS IGRE===\n\n" + description;
+		String content = "Title: " + name + "\n\n" + "Description: " + description;
 		Path path = Paths.get(TXT_DIR,baseFileName + ".txt");
 		Files.writeString(path, content);
 		
@@ -345,7 +345,7 @@ public class GameExtractorService {
 				
 			}
 		}
-		
+		System.out.println("Nevalidan format datuma, nijedan poznat format ne odgovara: '" + trimmed + "'");
 		return null;
 	}
 	private void putDate(ObjectNode target, String key, JsonNode source, String sourceField, String appId) {
