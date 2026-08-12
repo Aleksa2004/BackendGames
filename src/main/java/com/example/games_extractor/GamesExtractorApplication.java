@@ -14,7 +14,7 @@ public class GamesExtractorApplication implements CommandLineRunner{
     public GamesExtractorApplication(GameExtractorService gameExtractorService) {
         this.gameExtractorService = gameExtractorService;
     }
-
+    //trenutna postavka testiranja bez API-a
     @Override
     public void run(String... args) throws Exception {
         gameExtractorService.extractAndSaveGames();
