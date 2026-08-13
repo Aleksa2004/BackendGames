@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChunkingService {
 	//chunk counter za provjeru
+	private int chunkCounter=0;
 	private static final int CHUNK_SIZE = 600;
 	private static final int OVERLAP = 80;
 
@@ -25,6 +26,7 @@ public class ChunkingService {
 
 		if (text.length() <= CHUNK_SIZE) {
 			chunks.add(text.trim());
+			chunkCounter++;
 			return chunks;
 		}
 
@@ -35,6 +37,7 @@ public class ChunkingService {
 			// ako recenica predje chunk size ipak je dodaj
 			if (currentChunk.length() > 0 && currentChunk.length() + sentence.length() > CHUNK_SIZE) {
 				chunks.add(currentChunk.toString().trim());
+				chunkCounter++;
 
 				// novi chank pocinje sa overlapom od proslog
 				String overlapText = currentChunk.length() > OVERLAP
@@ -51,8 +54,12 @@ public class ChunkingService {
 		// na kraju sta ostane dodaj u poslednji chunk
 		if (currentChunk.length() > 0) {
 			chunks.add(currentChunk.toString().trim());
+			chunkCounter++;
 		}
 		return chunks;
 	}
-
+	
+	public int getTotalnChunck() {
+		return chunkCounter;
+	}
 }
