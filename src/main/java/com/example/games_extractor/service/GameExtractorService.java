@@ -25,6 +25,8 @@ import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 
+//Service za ekstrakciju i validaciju podataka o igricama iz velikog JSON dataset-a
+//Validne igrice čuva kao .txt (naslov + opis) i .metadata.json (strukturirani podaci) fajlove.
 @Service
 public class GameExtractorService {
 	
@@ -35,7 +37,7 @@ public class GameExtractorService {
 	private static final String METADATA_DIR = OUTPUT_DIR + "\\metadata";
 	
 	
-	private static final int GAMES_COUNT = 100;
+	private static final int GAMES_COUNT = 2500;
 	
 	private final LanguageDetector detector =  LanguageDetectorBuilder
 			.fromAllLanguages()
@@ -51,7 +53,6 @@ public class GameExtractorService {
 	public void extractAndSaveGames() throws Exception{
 		List<JsonNode> validGames = new ArrayList<>();
 		
-	
 		JsonFactory factory = new JsonFactory();
 		
 		Files.createDirectories(Paths.get(TXT_DIR));
@@ -342,10 +343,10 @@ public class GameExtractorService {
 				LocalDate.parse(trimmed,format);
 				return trimmed;
 			}catch(DateTimeParseException e) {
-				
+				//probaj sledeci format
 			}
 		}
-		System.out.println("Nevalidan format datuma, nijedan poznat format ne odgovara: '" + trimmed + "'");
+		System.out.println("Nijedan format nije odgovarao za datum: \"" + trimmed + "\" — postavljam null.");
 		return null;
 	}
 	private void putDate(ObjectNode target, String key, JsonNode source, String sourceField, String appId) {
