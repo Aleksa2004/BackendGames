@@ -1,0 +1,24 @@
+Generate exactly 3 realistic semantic-search queries for the provided game description:
+* one EASY
+* one MEDIUM
+* one HARD
+Queries must sound like natural searches a user would type into a game search bar.
+Describe the game through its gameplay, setting, mechanics, goals, atmosphere, or story.
+Do not write quiz, trivia, exam, or fact-based questions.
+Do not include the game title in the query.
+Use only information from the provided description. Do not use outside knowledge.
+Use natural paraphrasing instead of copying sentences from the description.
+EASY should describe an obvious characteristic.
+MEDIUM should combine multiple characteristics.
+HARD should describe the game indirectly using several related concepts.
+For each query return:
+* query
+* difficulty
+* expectedFile
+* expectedChunks
+* expectedSources
+expectedFile is the provided file name.
+expectedChunks contains the individual relevant chunk numbers as strings, e.g. ["1", "2"].
+Only include a chunk number if that chunk contains information necessary to answer the query. Do not include chunk 1 automatically.
+expectedSources contains one relevant sentence or short passage for each expected chunk, in the same order.
+Return only a valid JSON array containing exactly 3 objects. No markdown or explanations.
