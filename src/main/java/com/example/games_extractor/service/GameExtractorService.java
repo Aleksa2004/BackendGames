@@ -2,7 +2,6 @@ package com.example.games_extractor.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +36,7 @@ public class GameExtractorService {
 	private static final String METADATA_DIR = OUTPUT_DIR + "\\metadata";
 	
 	
-	private static final int GAMES_COUNT = 2500;
+	private static final int GAMES_COUNT = 5000;
 	
 	private final LanguageDetector detector =  LanguageDetectorBuilder
 			.fromAllLanguages()
@@ -185,21 +184,24 @@ public class GameExtractorService {
 		
 		
 	}
-	private void deleteFiles(String dirPath) throws IOException{
-		Path dir = Paths.get(dirPath);
-		
-		if(!Files.exists(dir)) {
-			return;
-		}
-		
-		try (DirectoryStream<Path> files = Files.newDirectoryStream(dir)) {
-	        for (Path file : files) {
-	            Files.deleteIfExists(file);
-	        }
+	private void deleteFiles(String dirPath) throws IOException {
+
+	    Path dir = Paths.get(dirPath);
+
+	    if (!Files.exists(dir)) {
+	        return;
 	    }
-		System.out.println("Ociscen folder: " + dirPath);
+
+	    Files.list(dir).forEach(file -> {
+	        try {
+	            Files.deleteIfExists(file);
+	        } catch (IOException e) {
+	            throw new RuntimeException(e);
+	        }
+	    });
+
+	    System.out.println("Ociscen folder: " + dirPath);
 	}
-	
 	private void clearDirectories() throws IOException{
 		deleteFiles(TXT_DIR);
 		deleteFiles(METADATA_DIR);
