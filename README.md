@@ -4,7 +4,7 @@ Backend servis za ekstrakciju, validaciju i pripremu podataka o igricama iz veli
 
 ## Status projekta
 
-U razvoju - trenutno implementirana faza ekstrakcije i validacije podataka. Sledeće faze (embedding, vektorska baza, RAG) su u planu.
+FINISHED!!!
 
 ## Tehnologije
 
