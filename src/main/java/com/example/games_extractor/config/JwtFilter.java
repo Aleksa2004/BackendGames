@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         );
 
                 authentication.setDetails(
-                        new UserAuthenticationDetails(userId, tenantId,tenantName)
+                        new UserAuthenticationDetails(userId,username, tenantId,tenantName)
                 );
 
                 SecurityContextHolder

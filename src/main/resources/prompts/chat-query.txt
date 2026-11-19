@@ -1,0 +1,47 @@
+Create the current game search filters from the conversation.
+
+Use ONLY USER messages. Ignore BOT messages.
+
+Combine all USER requirements. Later USER messages can change or refine earlier requirements.
+
+Extract:
+
+* price
+* requiredAge
+* windows
+* mac
+* linux
+* genres
+* categories
+* developers
+* releaseDate
+
+Use min/max ranges for price, requiredAge and releaseDate.
+Use true/false for platforms.
+
+semanticQuery contains only the semantic description of the desired game. Gameplay, mechanics, themes and preferences belong in semanticQuery. Hard filters do NOT belong in semanticQuery.
+
+IMPORTANT:
+Genres and categories are different.
+
+Genres:
+Action, Adventure, Casual, Indie, RPG, Racing, Simulation, Sports, Strategy
+
+Categories:
+Single-player, Multi-player, Co-op, PvP, Online PvP, Cross-Platform Multiplayer, Steam Achievements, Steam Trading Cards, Steam Cloud, Steam Leaderboards, Family Sharing, Partial Controller Support, Full Controller Support, In-App Purchases, Steam Workshop, Remote Play Together
+
+Examples:
+"indie" → genres: ["Indie"]
+"racing" → genres: ["Racing"]
+"singleplayer" → categories: ["Single-player"]
+"multiplayer" → categories: ["Multi-player"]
+"coop" → categories: ["Co-op"]
+
+Never put a genre in categories or a category in genres.
+Categories must use exact dataset names. Never invent category names.
+
+If a filter is not mentioned, use null or an empty list.
+
+semanticQuery must never be empty. If necessary, use "a game".
+
+Return only valid JSON matching the SearchFilters structure.

@@ -209,24 +209,54 @@ public class DocumentService {
 			String text = readDocument(filePath);
 
 			Long appId = null;
-
+			
+			JsonNode metadata = null;
+			
 			if (dataset.toLowerCase().startsWith("games")) {
-				Path metadataPath = filePath.resolveSibling(fileName.replace(".txt", ".metadata.json"));
 
-				String metadataJson = Files.readString(metadataPath, StandardCharsets.UTF_8);
+			    Path metadataPath =
+			            filePath.resolveSibling(
+			                    fileName.replace(".txt", ".metadata.json")
+			            );
 
-				JsonNode metadata = objectMapper.readTree(metadataJson);
+			    String metadataJson =
+			            Files.readString(
+			                    metadataPath,
+			                    StandardCharsets.UTF_8
+			            );
 
-				appId = metadata.get("app_id").asLong();
+			    metadata = objectMapper.readTree(metadataJson);
 
-				saveGame(text, metadataPath, tenantId);
+			    int requiredAge =
+			            metadata.get("required_age").asInt();
+
+			    if (requiredAge > 18) {
+
+			        System.out.println(
+			                "Igra preskocena zbog required_age > 18: "
+			                + fileName
+			                + " | Age: "
+			                + requiredAge
+			        );
+
+			        return;
+			    }
+
+			    appId =
+			            metadata.get("app_id").asLong();
+
+			    saveGame(
+			            text,
+			            metadataPath,
+			            tenantId
+			    );
 			}
 
 			embeddingDoc.setCharacterCount(text.length());
 
 			List<String> chunks = createChunks(text, dataset);
 
-			saveChunksToQdrant(chunks, fileName, tenant, dataset, collectionName, appId);
+			saveChunksToQdrant(chunks, fileName, tenant, dataset, collectionName, appId,metadata);
 
 			completeEmbeddingDoc(embeddingDoc, chunks.size());
 
@@ -325,6 +355,9 @@ public class DocumentService {
 		game.setReleaseDate(parseDate(metadata.get("release_date").asString()));
 
 		game.setDescription(extractField(text, "Description:"));
+		
+		
+		game.setMetadata(metadataJson);
 
 		JsonNode genres = metadata.get("genres");
 
@@ -352,11 +385,11 @@ public class DocumentService {
 
 
 	private void saveChunksToQdrant(List<String> chunks, String fileName, String tenant, String dataset,
-			String collectionName, Long appId) throws Exception {
+			String collectionName, Long appId,JsonNode metadata) throws Exception {
 
 		for (int i = 0; i < chunks.size(); i++) {
 
-			qdrantService.saveChunk(fileName, i + 1, chunks.get(i), tenant, dataset, collectionName, appId);
+			qdrantService.saveChunk(fileName, i + 1, chunks.get(i), tenant, dataset, collectionName, appId,metadata);
 		}
 	}
 

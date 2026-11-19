@@ -7,6 +7,11 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+import com.example.games_extractor.dto.Message;
+import com.example.games_extractor.dto.SearchFilters;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -113,8 +118,186 @@ public class GroqService {
             List<Message> messages
     ) {}
 
-    private record Message(
-            String role,
-            String content
+    private record GroqJsonRequest(
+            String model,
+            List<Message> messages,
+            ResponseFormat response_format
     ) {}
+
+    private record ResponseFormat(
+            String type
+    ) {}
+    public SearchFilters generateCurrentQuery(
+            List<Message> messages
+    ) throws Exception {
+
+        StringBuilder prompt = new StringBuilder(
+                promptService.loadPrompt("chat-query.txt")
+        );
+
+        prompt.append("\n\nConversation:\n");
+
+        for (Message message : messages) {
+
+            prompt.append(message.getRole())
+                  .append(": ")
+                  .append(message.getContent())
+                  .append("\n");
+        }
+
+        List<Message> groqMessages = new ArrayList<>();
+
+        groqMessages.add(
+                new Message(
+                        "system",
+                        prompt.toString()
+                )
+        );
+
+        for (Message message : messages) {
+
+            String role;
+
+            if (message.getRole().equals("USER")) {
+                role = "user";
+            } else if (message.getRole().equals("BOT")) {
+                role = "assistant";
+            } else {
+                continue;
+            }
+
+            groqMessages.add(
+                    new Message(
+                            role,
+                            message.getContent()
+                    )
+            );
+        }
+
+        String requestBody = mapper.writeValueAsString(
+                new GroqJsonRequest(
+                        model,
+                        groqMessages,
+                        new ResponseFormat("json_object")
+                )
+        );
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .POST(
+                        HttpRequest.BodyPublishers.ofString(requestBody)
+                )
+                .build();
+
+        HttpResponse<String> response =
+                httpClient.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+        if (response.statusCode() != 200) {
+
+            throw new RuntimeException(
+                    "Groq greska: "
+                    + response.statusCode()
+                    + " - "
+                    + response.body()
+            );
+        }
+
+        JsonNode root = mapper.readTree(response.body());
+
+        String content = root
+                .get("choices")
+                .get(0)
+                .get("message")
+                .get("content")
+                .asString();
+
+        return mapper.readValue(
+                content,
+                SearchFilters.class
+        );
+    }
+    public String generateChatAnswer(
+            String query,
+            List<SearchResult> results
+    ) throws Exception {
+
+        StringBuilder prompt = new StringBuilder(
+                promptService.loadPrompt("chat-answer.txt")
+        );
+
+        prompt.append("\n\nUser query:\n")
+              .append(query);
+
+        prompt.append("\n\nGames found:\n");
+
+        for (int i = 0; i < results.size(); i++) {
+
+            SearchResult result = results.get(i);
+
+            prompt.append("\nGame ")
+                  .append(i + 1)
+                  .append(":\n");
+
+            prompt.append(result.getChunk())
+                  .append("\n");
+        }
+
+        List<Message> groqMessages = List.of(
+                new Message(
+                        "user",
+                        prompt.toString()
+                )
+        );
+
+        String content = sendRequest(groqMessages);
+
+        return content.trim();
+    }
+    private String sendRequest(List<Message> messages) throws Exception {
+
+        String requestBody = mapper.writeValueAsString(
+                new GroqRequest(
+                        model,
+                        messages
+                )
+        );
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpResponse<String> response =
+                httpClient.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+        if (response.statusCode() != 200) {
+
+            throw new RuntimeException(
+                    "Groq greska: "
+                    + response.statusCode()
+                    + " - "
+                    + response.body()
+            );
+        }
+
+        JsonNode root = mapper.readTree(response.body());
+
+        return root
+                .get("choices")
+                .get(0)
+                .get("message")
+                .get("content")
+                .asString();
+    }
+   
 }

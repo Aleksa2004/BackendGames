@@ -1,0 +1,72 @@
+Extract hard filters and the semantic search query from the user's game search query.
+
+Hard filters:
+
+* price
+* requiredAge
+* windows
+* mac
+* linux
+* genres
+* categories
+* developers
+* releaseDate
+
+categories contains only actual game platform/category features such as:
+"Single-player", "Multi-player", "Co-op", "Steam Achievements",
+"Steam Trading Cards", "Steam Cloud", "Family Sharing",
+"Remote Play Together", "Shared/Split Screen", etc.
+
+Do not put gameplay features, mechanics, themes, or descriptions such as
+"exploration", "crafting", "survival", "building", "combat", or "open world"
+into categories. These belong in semanticQuery.
+
+semanticQuery must contain only the part describing what kind of game the user wants.
+Remove hard-filter conditions from it.
+
+semanticQuery must never be empty.
+If the query contains only hard filters, keep the main game type or genre as the semanticQuery.
+
+If a filter is not mentioned, use null or an empty list.
+
+For price, requiredAge, and releaseDate use min/max ranges.
+
+For platforms use true/false.
+
+For releaseDate:
+
+* "after 2020" → min = 2021-01-01
+* "before 2020" → max = 2019-12-31
+* "since 2020" → min = 2020-01-01
+* "released in 2020" → min = 2020-01-01, max = 2020-12-31
+
+Example:
+
+Query:
+
+"a racing game under $20 that supports Windows and was released after 2020"
+
+Return:
+
+{
+"semanticQuery": "a racing game",
+"price": {
+"min": 0,
+"max": 20
+},
+"requiredAge": null,
+"windows": true,
+"mac": null,
+"linux": null,
+"genres": [],
+"categories": [],
+"developers": [],
+"releaseDate": {
+"min": "2021-01-01",
+"max": null
+}
+}
+
+Return only valid JSON matching the SearchFilters structure.
+
+User query:

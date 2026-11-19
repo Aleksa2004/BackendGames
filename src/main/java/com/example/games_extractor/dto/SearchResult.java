@@ -11,7 +11,6 @@ public class SearchResult {
 	private Game game;
 
 	public SearchResult(String fileName, int chunkNumber, String chunk, float score,String reason,Game game) {
-		super();
 		this.fileName = fileName;
 		this.chunkNumber = chunkNumber;
 		this.chunk = chunk;

@@ -36,6 +36,10 @@ public class Game {
     
     @Column(name = "image_url")
     private String imageUrl;
+    
+    @Lob
+    @Column(columnDefinition = "JSON")
+    private String metadata;
 
     public Long getId() {
         return id;
@@ -107,6 +111,14 @@ public class Game {
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+	public String getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
 	}
 	
     
