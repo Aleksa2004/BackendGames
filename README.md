@@ -27,12 +27,6 @@ Detaljna dokumentacija za svaku celinu nalazi se u [`documentation/`](./document
 mvnw spring-boot:run -Dspring-boot.run.arguments=extract
 ```
 
-## Planirani sledeći koraci (RAG pipeline)
-
-1.  Embedding (Hugging Face, lokalno preko Ollama)
-2.  Vektorska baza (Chroma)
-3.  Similarity search
-4.  Generisanje odgovora preko Groq API-ja
 
 ## Napomene
 
